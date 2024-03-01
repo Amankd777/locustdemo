@@ -1,8 +1,14 @@
-from locust import HttpUser, task, between
+from locust import HttpUser, task, between, constant
 
 class WebsiteUser(HttpUser):
-    wait_time = between(1, 2)  # Random wait time between requests (1-2 seconds)
+    wait_time = constant(3)  # Wait for 3 seconds between requests
 
     @task
     def test_hello_world(self):
-        self.client.get("/")  # Simulates a GET request to the homepage route
+        try:
+            response = self.client.get("/")
+            if response.status_code != 200:
+                self.environment.runner.stop()  # Stop the test if the request fails
+        except Exception as e:
+            print(f"Error: {e}")
+            self.environment.runner.stop()  # Stop the test if an exception occurs
