@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies and start Flask app
         run: |
           pip install -r requirements.txt
-          python app.py &
+          python your_app.py &
         # Ensure that the Flask app starts running in the background
 
   locust:
@@ -36,4 +36,4 @@ jobs:
         run: pip install locust
 
       - name: Run load test
-        run: locust -f locustfile.py --headless --host=${HOST} --users ${USERS} --spawn-rate ${HATCH_RATE}
+        run: locust -f locustfile.py --headless --host=${HOST} --users=${USERS} --spawn-rate=${HATCH_RATE}
