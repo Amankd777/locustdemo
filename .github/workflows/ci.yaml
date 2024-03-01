@@ -1,0 +1,39 @@
+name: Load Testing
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  start_flask_app:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies and start Flask app
+        run: |
+          pip install -r requirements.txt
+          python app.py &
+        # Ensure that the Flask app starts running in the background
+
+  locust:
+    needs: start_flask_app
+    runs-on: ubuntu-latest
+
+    env:
+      HOST: http://localhost:8000
+      USERS: 100
+      HATCH_RATE: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: pip install locust
+
+      - name: Run load test
+        run: locust -f locustfile.py --headless --host=${HOST} --users ${USERS} --spawn-rate ${HATCH_RATE}
